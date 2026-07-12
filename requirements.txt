@@ -1,0 +1,14 @@
+# QuantProject v2 - Python dependencies
+# Install: pip install -r requirements.txt
+yfinance==0.2.43
+lightgbm==4.3.0
+xgboost==3.3.0
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.4.2
+matplotlib==3.8.4
+seaborn==0.13.2
+scipy==1.13.0
+pyarrow==15.0.2
+joblib==1.4.0
+streamlit>=1.35.0
