@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support - QuantApp</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem;
+    color: #14202b; background: #fff;
+  }
+  h1 { font-size: 1.7rem; margin-bottom: .25rem; }
+  h2 { font-size: 1.1rem; margin-top: 2rem; }
+  .date { color: #64748b; font-size: .9rem; margin-top: 0; }
+  strong { color: #0b1620; }
+  a { color: #0a6c8a; }
+  dt { font-weight: 600; margin-top: 1.1rem; }
+  dd { margin: .3rem 0 0; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;
+           font-size: .9rem; color: #64748b; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #d7e3ec; background: #0b1218; }
+    strong { color: #eaf4fa; }
+    a { color: #45e0ff; }
+    footer { border-top-color: #1e2c38; color: #7fa0b3; }
+    .date { color: #7fa0b3; }
+  }
+</style>
+</head>
+<body>
+<h1>QuantApp Support</h1>
+<p class="date">Questions, problems, or feedback.</p>
+
+<p>Email <a href="mailto:nedimyldrm2008@gmail.com">nedimyldrm2008@gmail.com</a>.
+There is no account system, so please describe what you saw and which screen you
+were on.</p>
+
+<h2>Common questions</h2>
+<dl>
+  <dt>How often do the rankings update?</dt>
+  <dd>Once a week. The model scores the universe after Friday's close, so a
+  fresh ranking is in place before the following week opens.</dd>
+
+  <dt>Why is a highly ranked stock not in the book?</dt>
+  <dd>The strategy holds 25 positions and allows at most 8 from any one sector.
+  Once a sector is full, the next stock from it is skipped in favour of the best
+  available name elsewhere. This is deliberate: without the limit the book
+  becomes a single-sector bet.</dd>
+
+  <dt>Is this investment advice?</dt>
+  <dd>No. QuantApp is educational and informational only. It does not place
+  trades, connect to a brokerage, or tell you what to buy. Quantitative output is
+  one input among many, and you are responsible for your own decisions.</dd>
+
+  <dt>Where do the historical results come from?</dt>
+  <dd>A walk-forward backtest over 27 out-of-sample quarters. The model is
+  retrained on past data only and tested on the period that follows, never on
+  data it has seen. The Telemetry screen shows the resulting track record.</dd>
+
+  <dt>Are the backtest results guaranteed?</dt>
+  <dd>No. Past performance does not predict future results. The backtest also
+  carries survivorship bias, because the stock universe is built from companies
+  that are in the index today, so it likely overstates what live trading would
+  have returned. This limitation is stated in the app.</dd>
+
+  <dt>Do you collect my data?</dt>
+  <dd>No. There is no login and no tracking. See the
+  <a href="./privacy.html">privacy policy</a>.</dd>
+</dl>
+
+<footer><a href="./privacy.html">Privacy policy</a></footer>
+</body>
+</html>
