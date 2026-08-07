@@ -3,7 +3,9 @@ QuantProject v2 - Central Configuration
 Single source of truth for all parameters.
 """
 
-# ── Universe: full S&P 500 constituent list (503 tickers as of June 2025)
+# ── Universe: full S&P 500 constituent list (504 tickers as of June 2025)
+# Audited 2026-08-06: the original hand-entered list held only 459 names and
+# silently omitted 45 constituents, NVDA among them. Corrected below.
 # Source: https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
 # Survivorship bias note: yfinance only returns data for currently listed
 # tickers; delisted stocks are absent, which inflates backtest returns
@@ -84,6 +86,18 @@ UNIVERSE = [
     "DTE", "DUK", "ED", "EIX", "ES", "ETR", "EVRG", "EXC",
     "FE", "LNT", "NEE", "NI", "NRG", "NWS", "PCG", "PEG",
     "PNW", "PPL", "SRE", "SO", "VST", "WEC", "XEL",
+    # Constituents missing from the original hand-entered list (audit 2026-08-06).
+    # NVDA in particular was absent, which materially affected the backtest.
+    # Sector assignment for these comes from SECTOR_MAP below, not list position.
+    "NVDA", "ANSS", "AKAM", "TRMB", "JNPR", "QRVO",
+    "SHW", "CE", "SEE", "CTVA",
+    "MMC", "WTW", "ACGL", "CMA", "ZION",
+    "CI", "DGX", "WST", "MOH", "HOLX", "ILMN", "VTRS", "XRAY",
+    "CSX", "ETN", "VRSK", "EFX", "AAL", "ALK",
+    "DHI", "TSCO", "POOL", "BBWI", "CZR", "HAS", "KMX", "LKQ", "NWL",
+    "DLTR", "CPB", "LW", "WBA",
+    "IPG", "MTCH",
+    "CSGP",
 ]
 # De-duplicate while preserving order (a few tickers appear in two sectors above)
 _seen: set = set()
@@ -441,4 +455,29 @@ SECTOR_MAP: dict = {
     "PPL":  "Utilities", "SRE":  "Utilities",
     "SO":   "Utilities", "VST":  "Utilities",
     "WEC":  "Utilities", "XEL":  "Utilities",
+    # GICS sectors for the constituents added in the 2026-08-06 universe audit.
+    "NVDA": "Information Technology", "ANSS": "Information Technology",
+    "AKAM": "Information Technology", "TRMB": "Information Technology",
+    "JNPR": "Information Technology", "QRVO": "Information Technology",
+    "SHW":  "Materials", "CE":   "Materials",
+    "SEE":  "Materials", "CTVA": "Materials",
+    "MMC":  "Financials", "WTW":  "Financials",
+    "ACGL": "Financials", "CMA":  "Financials",
+    "ZION": "Financials",
+    "CI":   "Health Care", "DGX":  "Health Care",
+    "WST":  "Health Care", "MOH":  "Health Care",
+    "HOLX": "Health Care", "ILMN": "Health Care",
+    "VTRS": "Health Care", "XRAY": "Health Care",
+    "CSX":  "Industrials", "ETN":  "Industrials",
+    "VRSK": "Industrials", "EFX":  "Industrials",
+    "AAL":  "Industrials", "ALK":  "Industrials",
+    "DHI":  "Consumer Discretionary", "TSCO": "Consumer Discretionary",
+    "POOL": "Consumer Discretionary", "BBWI": "Consumer Discretionary",
+    "CZR":  "Consumer Discretionary", "HAS":  "Consumer Discretionary",
+    "KMX":  "Consumer Discretionary", "LKQ":  "Consumer Discretionary",
+    "NWL":  "Consumer Discretionary",
+    "DLTR": "Consumer Staples", "CPB":  "Consumer Staples",
+    "LW":   "Consumer Staples", "WBA":  "Consumer Staples",
+    "IPG":  "Communication Services", "MTCH": "Communication Services",
+    "CSGP": "Real Estate",
 }

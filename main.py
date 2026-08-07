@@ -43,6 +43,11 @@ import config
 # ═══════════════════════════════════════════════════════════════════════════
 
 _DOWNLOAD_BATCH_SIZE = 100   # tickers per yfinance request
+
+# Tickers that the provider has no data for (delisted, merged, renamed).
+# Recorded so the cache-coverage check does not trigger a full re-download
+# every run just because a dead ticker can never be fetched.
+_MISSING_PATH = config.PRICES_PATH.parent / "missing_tickers.json"
 _MIN_WEEKS           = 100   # drop tickers with fewer valid weekly bars
 
 
@@ -87,9 +92,27 @@ def download_data() -> dict[str, pd.DataFrame]:
             result[field] = store[field]
         if isinstance(result.get("spy_close"), pd.DataFrame):
             result["spy_close"] = result["spy_close"].squeeze().rename("SPY")
-        log.info("Cache loaded: %d weeks × %d tickers",
-                 len(result["close"]), result["close"].shape[1])
-        return result
+
+        # The cache is only valid if it covers the universe we are asked for.
+        # Without this check, editing UNIVERSE silently has no effect: the stale
+        # parquet is reused and the new tickers never enter the backtest.
+        # Tickers that genuinely have no data are recorded in _MISSING_PATH so a
+        # permanently undownloadable name does not force a refetch every run.
+        wanted = {t for t in config.UNIVERSE if t != "SPY"}
+        cached = set(result["close"].columns)
+        known_absent: set = set()
+        if _MISSING_PATH.exists():
+            known_absent = set(json.loads(_MISSING_PATH.read_text()))
+        gap = wanted - cached - known_absent
+        if gap:
+            log.warning("Cache covers %d tickers but %d are missing (%s%s); "
+                        "re-downloading.", len(cached), len(gap),
+                        ", ".join(sorted(gap)[:8]),
+                        ", ..." if len(gap) > 8 else "")
+        else:
+            log.info("Cache loaded: %d weeks × %d tickers",
+                     len(result["close"]), result["close"].shape[1])
+            return result
 
     # Always include SPY (needed for regime filter + idio_vol)
     all_tickers = ["SPY"] + [t for t in config.UNIVERSE if t != "SPY"]
@@ -205,6 +228,14 @@ def download_data() -> dict[str, pd.DataFrame]:
     store.to_parquet(config.PRICES_PATH)
     log.info("Cached to %s (%d weeks, %d tickers)",
              config.PRICES_PATH, len(date_idx), len(universe_cols))
+
+    # Record which universe names produced no data, so the coverage check above
+    # can distinguish "never fetched" from "cannot be fetched".
+    absent = sorted({t for t in config.UNIVERSE if t != "SPY"} - set(universe_cols))
+    _MISSING_PATH.write_text(json.dumps(absent, indent=1))
+    if absent:
+        log.info("No data for %d universe tickers (recorded in %s): %s",
+                 len(absent), _MISSING_PATH.name, ", ".join(absent[:10]))
     return result
 
 
@@ -340,7 +371,8 @@ def _rsi(close: pd.DataFrame, period: int = 14) -> pd.DataFrame:
     return 100.0 - (100.0 / (1.0 + rs))
 
 
-def compute_features(data: dict, fund_df: pd.DataFrame = None) -> pd.DataFrame:
+def compute_features(data: dict, fund_df: pd.DataFrame = None,
+                     require_target: bool = True) -> pd.DataFrame:
     """
     Compute 30 cross-sectional features for every (week, ticker) pair:
       25 technical features (rolling windows, all backward-looking)
@@ -504,8 +536,11 @@ def compute_features(data: dict, fund_df: pd.DataFrame = None) -> pd.DataFrame:
     panel["fwd_ret"]  = fwd_ret_long
     panel["fwd_rank"] = fwd_rank_long
 
-    # Drop rows missing target (last week has no forward return)
-    panel = panel.dropna(subset=["fwd_rank"])
+    # Drop rows missing target (the final FORWARD_WEEKS weeks have no forward
+    # return). Training/backtest needs the target; live scoring must NOT drop
+    # these rows or predictions lag a month behind (require_target=False).
+    if require_target:
+        panel = panel.dropna(subset=["fwd_rank"])
 
     # Cross-sectional rank normalisation of features (per date, rank [0,1])
     # This removes absolute-level effects so model learns relative ordering

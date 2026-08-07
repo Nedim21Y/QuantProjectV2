@@ -84,7 +84,7 @@ def generate_signals(model, feature_cols: list, top_n: int = 10) -> pd.DataFrame
     """
     data    = download_recent_data(n_weeks=config.LOOKBACK_WEEKS + 5)
     fund_df = fetch_fundamentals(config.UNIVERSE)
-    panel   = compute_features(data, fund_df)
+    panel   = compute_features(data, fund_df, require_target=False)
 
     # Get the most recent date with complete feature data
     recent_dates = panel.index.get_level_values("Date").unique().sort_values()
